@@ -3,15 +3,15 @@ Introduction
 
 `gorganizer` is a simple python script that uses the gmail API to organize your gmail messages by sender domains. It allows you to automatically create labels named by the sender domains of the analyzed messages and then to sort the messages under these labels. This script does not create gmail filters, it just sorts your messages at the time of calling it. Just install the required python dependencies and call the script directly from the current directory. Take a look at the help dialog of the script for more details.
 
-Install python dependencies (bash or zsh)
+Install python dependencies
 ---------------------------
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Enable autocompletion
----------------------
+Enable autocompletion (bash or zsh)
+-----------------------------------
 
 ```bash
 ./enable-autocomplete.sh
