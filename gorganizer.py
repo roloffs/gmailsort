@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
+# PYTHON_ARGCOMPLETE_OK
 
 import sys
 import json
 import argparse
+import argcomplete
 import textwrap
 
 from argparse import RawTextHelpFormatter
@@ -287,6 +289,8 @@ def main() -> None:
     )
     find_parser.set_defaults(func=cmd_find_labels)
 
+    # Enable autocompletion
+    argcomplete.autocomplete(parser)
     # Parse arguments and dispatch command
     args = parser.parse_args()
     args.func(args)
