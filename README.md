@@ -1,9 +1,22 @@
 Introduction
 ------------
 
-`gmailsort` is a simple python script that uses the gmail API to organize your gmail messages by sender domains. It allows you to automatically create labels named by the sender domains of the analyzed messages and then to sort the messages under these labels. This script does not create gmail filters, it just sorts your messages at the time of calling it. Just install the required python dependencies and call the script directly from the current directory. Take a look at the help dialog of the script for more details.
+`gmailsort` is a simple Python script that uses the Gmail API to organize your Gmail messages by sender domains. It allows you to automatically create labels named by the sender domains of the analyzed messages and then to sort the messages under these labels. This script does not create Gmail filters, it just sorts your messages at the time of calling it. Just install the required Python dependencies and call the script directly from the current directory. Take a look at the help dialog of the script for more details.
 
-Install python dependencies
+Requirements to use Gmail API
+-----------------------------
+
+In order for you to use this script and thus the Gmail API, you will need the following:
+
+1. Create a new [Google Cloud project](https://developers.google.com/workspace/guides/create-project).
+
+1. Enable the [Gmail API](https://console.cloud.google.com/flows/enableapi?apiid=gmail.googleapis.com) for your project.
+
+1. Add yourself as test user to the [OAuth consent screen](https://console.cloud.google.com/apis/credentials/consent).
+
+1. Create [OAuth 2.0 client credentials](https://console.cloud.google.com/apis/credentials) for your project and store them under `credentials.json` in the current directory.
+
+Install Python dependencies
 ---------------------------
 
 ```bash
@@ -19,9 +32,9 @@ Usage examples
     ./gmailsort.py -p user analyze -s INBOX -d test -v
     ```
 
-    If this is called for the first time with the given profile name, a gmail login dialog will open and you have to login and allow the app to access your messages. Afterwards, an initial message data download is issued. This will probably take several minutes depending on the amount of messages in your gmail account. All subsequent calls will be much faster and just synchronize the differences between local and remote data.
+    If this is called for the first time with the given profile name, a Gmail login dialog will open and you have to login and allow the app to access your messages. Afterwards, an initial message data download is issued. This will probably take several minutes depending on the amount of messages in your Gmail account. All subsequent calls will be much faster and just synchronize the differences between local and remote data.
 
-    `INBOX` is a gmail built-in label name for your inbox. User-defined labels can have any name except these and can be organized hierarchically. To name a hierarchical label, use a single string and separate the hierarchies with slashes, e.g., `foo/bar`.
+    `INBOX` is a Gmail built-in label name for your inbox. User-defined labels can have any name except these and can be organized hierarchically. To name a hierarchical label, use a single string and separate the hierarchies with slashes, e.g., `foo/bar`.
 
     Specifying a destination label (as `test` in this case) is optional. Otherwise, labels will be created top level. If you are happy with the envisaged labels structure, you can actually create it by calling the command again and adding the command-line option `-c` or `--create-labels`.
 
