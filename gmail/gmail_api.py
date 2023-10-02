@@ -19,7 +19,7 @@ from httplib2.error import ServerNotFoundError
 
 
 # ------------------------------------------------------------------------------
-# Gmail API python quickstart:
+# Gmail API Python quickstart:
 # https://developers.google.com/gmail/api/quickstart/python
 # ------------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ from httplib2.error import ServerNotFoundError
 
 
 # Gmail API access rights
-SCOPES = ['https://www.googleapis.com/auth/gmail.modify']
+SCOPES = ["https://www.googleapis.com/auth/gmail.modify"]
 
 # Maximum results per page
 MAX_RESULTS = 500
@@ -43,32 +43,37 @@ MAX_RETRIES = 10
 
 
 class MyBar(Bar):
-    suffix = '%(index)d/%(max)d (%(percent).1f%%) - %(hours)dh:%(mins)dm:%(secs)ds'
+    suffix = (
+        "%(index)d/%(max)d (%(percent).1f%%) - %(hours)dh:%(mins)dm:%(secs)ds"
+    )
+
     @property
     def hours(self):
         return self.eta // 3600
+
     @property
     def mins(self):
         return (self.eta - self.hours * 3600) // 60
+
     @property
     def secs(self):
         return self.eta - self.hours * 3600 - self.mins * 60
 
 
 def __http_error(err):
-    print(f'HTTP error returned by gmail: {err.reason}')
+    print(f"HTTP error returned by gmail: {err.reason}")
 
 
 def __auth_error(err):
-    print(f'Authentication error at gmail: {err}')
+    print(f"Authentication error at gmail: {err}")
 
 
 def __connection_error(err):
-    print(f'Connection error: {err}')
+    print(f"Connection error: {err}")
 
 
 def __build_service(creds):
-    return build('gmail', 'v1', credentials=creds)
+    return build("gmail", "v1", credentials=creds)
 
 
 def __fix_strings(obj):
@@ -88,7 +93,7 @@ def authenticate(token_file, credentials_file):
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    print(f'Authenticate at gmail with token [{token_file}]')
+    print(f"Authenticate at gmail with token [{token_file}]")
     if os.path.exists(token_file):
         creds = Credentials.from_authorized_user_file(token_file, SCOPES)
     # If there are no (valid) credentials available, let the user log in.
@@ -100,9 +105,12 @@ def authenticate(token_file, credentials_file):
                 __auth_error(err)
                 return (None, True)
         else:
-            print(f'No valid token found: login at gmail [create \'{token_file}\']')
+            print(
+                f"No valid token found: login at gmail [create '{token_file}']"
+            )
             flow = InstalledAppFlow.from_client_secrets_file(
-                credentials_file, SCOPES)
+                credentials_file, SCOPES
+            )
             try:
                 creds = flow.run_local_server(port=0)
             except GoogleAuthError as err:
@@ -110,7 +118,7 @@ def authenticate(token_file, credentials_file):
                 return (None, True)
         # Save the credentials for the next run
         os.makedirs(os.path.dirname(token_file), exist_ok=True)
-        with open(token_file, 'w') as token:
+        with open(token_file, "w") as token:
             token.write(creds.to_json())
     return (creds, False)
 
@@ -118,9 +126,7 @@ def authenticate(token_file, credentials_file):
 def get_profile(creds):
     service = __build_service(creds)
     try:
-        response = service.users().getProfile(
-            userId='me'
-        ).execute()
+        response = service.users().getProfile(userId="me").execute()
         response = __fix_strings(response)
     except HttpError as err:
         __http_error(err)
@@ -136,22 +142,27 @@ def get_message_ids(creds):
     (profile, err) = get_profile(creds)
     if err:
         return ([], True)
-    num_messages = profile['messagesTotal']
+    num_messages = profile["messagesTotal"]
 
     # Download messages ids (cannot be processed in parallel due to page-based processing)
     messages_ids = list()
-    page_token = ''
-    bar = MyBar('Downloading', max=num_messages)
+    page_token = ""
+    bar = MyBar("Downloading", max=num_messages)
     service = __build_service(creds)
-    print(f'Get message ids ...')
+    print(f"Get message ids ...")
     while True:
         try:
-            response = service.users().messages().list(
-                userId='me',
-                maxResults=MAX_RESULTS,
-                pageToken=page_token,
-                # includeSpamTrash='true'
-            ).execute()
+            response = (
+                service.users()
+                .messages()
+                .list(
+                    userId="me",
+                    maxResults=MAX_RESULTS,
+                    pageToken=page_token,
+                    # includeSpamTrash='true'
+                )
+                .execute()
+            )
             response = __fix_strings(response)
         except HttpError as err:
             __http_error(err)
@@ -159,11 +170,11 @@ def get_message_ids(creds):
         except ServerNotFoundError as err:
             __connection_error(err)
             return ([], True)
-        messages = response.get('messages', [])
-        messages = list(map(lambda msg: msg['id'], messages))
+        messages = response.get("messages", [])
+        messages = list(map(lambda msg: msg["id"], messages))
         messages_ids.extend(messages)
         bar.next(len(messages))
-        page_token = response.get('nextPageToken')
+        page_token = response.get("nextPageToken")
         if not page_token:
             break
     if num_messages > 0:
@@ -175,19 +186,24 @@ def get_messages(creds, message_ids):
     # Download message data
     lock = Lock()
     messages = list()
-    bar = MyBar('Downloading', max=len(message_ids))
+    bar = MyBar("Downloading", max=len(message_ids))
 
     def body(message_id):
         num_retries = 0
         while True:
             try:
                 service = __build_service(creds)
-                response = service.users().messages().get(
-                    userId='me',
-                    id=message_id,
-                    format='metadata',
-                    metadataHeaders=['From', 'Subject']
-                ).execute()
+                response = (
+                    service.users()
+                    .messages()
+                    .get(
+                        userId="me",
+                        id=message_id,
+                        format="metadata",
+                        metadataHeaders=["From", "Subject"],
+                    )
+                    .execute()
+                )
                 response = __fix_strings(response)
                 with lock:
                     messages.append(response)
@@ -202,7 +218,7 @@ def get_messages(creds, message_ids):
                 else:
                     raise err
 
-    print(f'Get message data ...')
+    print(f"Get message data ...")
     with ThreadPool(16) as pool:
         try:
             pool.map(body, message_ids)
@@ -220,18 +236,23 @@ def get_messages(creds, message_ids):
 def get_history_items(creds, start_history_id):
     # Download history items (cannot be processed in parallel due to page-based processing)
     history_items = list()
-    page_token = ''
+    page_token = ""
     service = __build_service(creds)
-    print(f'Get history items since history id {start_history_id} ...')
+    print(f"Get history items since history id {start_history_id} ...")
     while True:
         try:
             # Does include TRASH and SPAM
-            response = service.users().history().list(
-                userId='me',
-                maxResults=MAX_RESULTS,
-                pageToken=page_token,
-                startHistoryId=start_history_id
-            ).execute()
+            response = (
+                service.users()
+                .history()
+                .list(
+                    userId="me",
+                    maxResults=MAX_RESULTS,
+                    pageToken=page_token,
+                    startHistoryId=start_history_id,
+                )
+                .execute()
+            )
             response = __fix_strings(response)
         except HttpError as err:
             __http_error(err)
@@ -239,9 +260,9 @@ def get_history_items(creds, start_history_id):
         except ServerNotFoundError as err:
             __connection_error(err)
             return ([], True)
-        history = response.get('history', [])
+        history = response.get("history", [])
         history_items.extend(history)
-        page_token = response.get('nextPageToken')
+        page_token = response.get("nextPageToken")
         if not page_token:
             break
     return (history_items, False)
@@ -249,11 +270,9 @@ def get_history_items(creds, start_history_id):
 
 def get_labels(creds):
     service = __build_service(creds)
-    print(f'Get labels ...')
+    print(f"Get labels ...")
     try:
-        response = service.users().labels().list(
-            userId='me'
-        ).execute()
+        response = service.users().labels().list(userId="me").execute()
         response = __fix_strings(response)
     except HttpError as err:
         __http_error(err)
@@ -261,18 +280,20 @@ def get_labels(creds):
     except ServerNotFoundError as err:
         __connection_error(err)
         return ([], True)
-    labels = response.get('labels', [])
+    labels = response.get("labels", [])
     return (labels, False)
 
 
 def create_label(creds, label_name):
     service = __build_service(creds)
-    print(f'Create label \'{label_name}\' ...')
+    print(f"Create label '{label_name}' ...")
     try:
-        response = service.users().labels().create(
-            userId='me',
-            body={'name': label_name}
-        ).execute()
+        response = (
+            service.users()
+            .labels()
+            .create(userId="me", body={"name": label_name})
+            .execute()
+        )
         response = __fix_strings(response)
     except HttpError as err:
         __http_error(err)
@@ -285,17 +306,24 @@ def create_label(creds, label_name):
 
 def modify_message_labels(creds, message_ids, add_label_ids, remove_label_ids):
     # Partition message ids into chunks of maximum batch-processible size
-    msg_id_chunks = [message_ids[i:i+MAX_BATCH_SIZE] for i in range(0,len(message_ids),MAX_BATCH_SIZE)]
+    msg_id_chunks = [
+        message_ids[i : i + MAX_BATCH_SIZE]
+        for i in range(0, len(message_ids), MAX_BATCH_SIZE)
+    ]
 
     # Modify message labels
     service = __build_service(creds)
-    print(f'Modify labels of {len(message_ids)} messages ...')
+    print(f"Modify labels of {len(message_ids)} messages ...")
     for msg_ids in msg_id_chunks:
         try:
             # Response is ignored, since it only returns an empty body on success
             service.users().messages().batchModify(
-                userId='me',
-                body={'ids': msg_ids, 'addLabelIds': add_label_ids, 'removeLabelIds': remove_label_ids}
+                userId="me",
+                body={
+                    "ids": msg_ids,
+                    "addLabelIds": add_label_ids,
+                    "removeLabelIds": remove_label_ids,
+                },
             ).execute()
         except HttpError as err:
             __http_error(err)
@@ -311,15 +339,12 @@ def execute_api_call(creds, calls, args):
     resource = service.users
     for call in calls:
         if not hasattr(resource(), call):
-            print(f'Unknown command: \'{call}\'')
+            print(f"Unknown command: '{call}'")
             return (None, True)
         resource = getattr(resource(), call)
     response = None
     try:
-        response = resource(
-            userId='me',
-            **args
-        ).execute()
+        response = resource(userId="me", **args).execute()
         response = __fix_strings(response)
     except HttpError as err:
         __http_error(err)
@@ -328,6 +353,6 @@ def execute_api_call(creds, calls, args):
         __connection_error(err)
         return (None, True)
     except TypeError as err:
-        print(f'Incomplete command: \'{calls}\'')
+        print(f"Incomplete command: '{calls}'")
         return (None, True)
     return (response, False)
