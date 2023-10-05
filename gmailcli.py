@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 
-import sys
 import json
+import sys
 
-from gmail import gmail
-from gmail import history
+from gmail import gmail, history
 
 
 def main() -> None:
@@ -26,10 +25,10 @@ def main() -> None:
                     )
                 )
 
-        except KeyboardInterrupt as err:
+        except KeyboardInterrupt:
             print("\nKeyboardInterrupt")
 
-        except EOFError as err:
+        except EOFError:
             print()
             break
 

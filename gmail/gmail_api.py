@@ -1,22 +1,24 @@
+"""Convenience wrapper for the Gmail API client library"""
 from __future__ import print_function
 
-import os
-import time
-import random
-import ftfy
 import html
+import os
+import random
+import time
+from multiprocessing.pool import ThreadPool
+from socket import timeout
+from threading import Lock
+from typing import Any, Dict
 
-from google.auth.transport.requests import Request
+import ftfy
 from google.auth.exceptions import GoogleAuthError
+from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from multiprocessing.pool import ThreadPool
-from threading import Lock
-from progress.bar import Bar
 from httplib2.error import ServerNotFoundError
-
+from progress.bar import Bar
 
 # ------------------------------------------------------------------------------
 # Gmail API Python quickstart:
@@ -43,29 +45,34 @@ MAX_RETRIES = 10
 
 
 class MyBar(Bar):
+    """Customized bar implementation"""
+
     suffix = (
         "%(index)d/%(max)d (%(percent).1f%%) - %(hours)dh:%(mins)dm:%(secs)ds"
     )
 
     @property
     def hours(self):
+        """Hours format"""
         return self.eta // 3600
 
     @property
     def mins(self):
+        """Minutes format"""
         return (self.eta - self.hours * 3600) // 60
 
     @property
     def secs(self):
+        """Seconds format"""
         return self.eta - self.hours * 3600 - self.mins * 60
 
 
 def __http_error(err):
-    print(f"HTTP error returned by gmail: {err.reason}")
+    print(f"HTTP error returned by Gmail: {err.reason}")
 
 
 def __auth_error(err):
-    print(f"Authentication error at gmail: {err}")
+    print(f"Authentication error at Gmail: {err}")
 
 
 def __connection_error(err):
@@ -78,11 +85,11 @@ def __build_service(creds):
 
 def __fix_strings(obj):
     if isinstance(obj, dict):
-        for k, v in obj.items():
-            obj[k] = __fix_strings(v)
+        for key, value in obj.items():
+            obj[key] = __fix_strings(value)
     elif isinstance(obj, list):
-        for i, v in enumerate(obj):
-            obj[i] = __fix_strings(v)
+        for index, value in enumerate(obj):
+            obj[index] = __fix_strings(value)
     elif isinstance(obj, str):
         obj = ftfy.fix_text(html.unescape(obj))
     return obj
@@ -90,10 +97,10 @@ def __fix_strings(obj):
 
 def authenticate(token_file, credentials_file):
     creds = None
-    # The file token.json stores the user's access and refresh tokens, and is
-    # created automatically when the authorization flow completes for the first
-    # time.
-    print(f"Authenticate at gmail with token [{token_file}]")
+    # The file token.json stores the user's access and refresh tokens,
+    # and is created automatically when the authorization flow completes
+    # for the first time.
+    print(f"Authenticate at Gmail with token [{token_file}]")
     if os.path.exists(token_file):
         creds = Credentials.from_authorized_user_file(token_file, SCOPES)
     # If there are no (valid) credentials available, let the user log in.
@@ -106,7 +113,7 @@ def authenticate(token_file, credentials_file):
                 return (None, True)
         else:
             print(
-                f"No valid token found: login at gmail [create '{token_file}']"
+                f"No valid token found: login at Gmail [create '{token_file}']"
             )
             flow = InstalledAppFlow.from_client_secrets_file(
                 credentials_file, SCOPES
@@ -118,7 +125,7 @@ def authenticate(token_file, credentials_file):
                 return (None, True)
         # Save the credentials for the next run
         os.makedirs(os.path.dirname(token_file), exist_ok=True)
-        with open(token_file, "w") as token:
+        with open(token_file, "w", encoding="utf-8") as token:
             token.write(creds.to_json())
     return (creds, False)
 
@@ -234,8 +241,9 @@ def get_messages(creds, message_ids):
 
 
 def get_history_items(creds, start_history_id):
-    # Download history items (cannot be processed in parallel due to page-based processing)
-    history_items = list()
+    # Download history items (cannot be processed in parallel due to
+    # page-based processing)
+    history_items = []
     page_token = ""
     service = __build_service(creds)
     print(f"Get history items since history id {start_history_id} ...")
@@ -269,8 +277,7 @@ def get_history_items(creds, start_history_id):
 
 
 def get_labels(creds):
-    service = __build_service(creds)
-    print(f"Get labels ...")
+    print("Get labels ...")
     try:
         response = service.users().labels().list(userId="me").execute()
         response = __fix_strings(response)
@@ -305,7 +312,8 @@ def create_label(creds, label_name):
 
 
 def modify_message_labels(creds, message_ids, add_label_ids, remove_label_ids):
-    # Partition message ids into chunks of maximum batch-processible size
+    # Partition message ids into chunks of maximum batch-processible
+    # size
     msg_id_chunks = [
         message_ids[i : i + MAX_BATCH_SIZE]
         for i in range(0, len(message_ids), MAX_BATCH_SIZE)

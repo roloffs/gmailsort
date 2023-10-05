@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
-import sys
-import json
 import argparse
+import json
+import sys
 import textwrap
-
 from argparse import RawTextHelpFormatter
+
 from gmail import gmail
 
 
@@ -50,7 +50,7 @@ def cmd_analyze_messages(args):
                 f"Only process {len(include_domains)} domains:"
                 f" {include_domains}"
             )
-            tmp_domains = dict()
+            tmp_domains = {}
             for domain in include_domains:
                 if domain in domains:
                     tmp_domains[domain] = domains[domain]
@@ -73,28 +73,32 @@ def cmd_analyze_messages(args):
         print(f"{len(domains)} envisaged labels {dst_label_str}")
 
         # Print results
-        get_domain_str = lambda domain: (
-            f"{dst_label}/{domain}" if dst_label else f"{domain}"
-        )
+        def get_domain_str(domain):
+            return f"{dst_label}/{domain}" if dst_label else f"{domain}"
+
         if verbosity > 0:
             for domain, fq_domains in sorted(domains.items()):
                 print(get_domain_str(domain))
-                if verbosity > 1:
-                    for fq_domain, messages in sorted(fq_domains.items()):
-                        print(f"    {fq_domain}: {len(messages)} messages")
-                        if verbosity > 2:
-                            for message in messages:
-                                if verbosity == 3:
-                                    print(f'        {message["snippet"]}')
-                                else:
-                                    print(
-                                        json.dumps(
-                                            message,
-                                            indent=2,
-                                            ensure_ascii=False,
-                                            sort_keys=True,
-                                        )
-                                    )
+                if verbosity <= 1:
+                    continue
+
+                for fq_domain, messages in sorted(fq_domains.items()):
+                    print(f"    {fq_domain}: {len(messages)} messages")
+                    if verbosity <= 2:
+                        continue
+
+                    for message in messages:
+                        if verbosity == 3:
+                            print(f'        {message["snippet"]}')
+                        else:
+                            print(
+                                json.dumps(
+                                    message,
+                                    indent=2,
+                                    ensure_ascii=False,
+                                    sort_keys=True,
+                                )
+                            )
 
         # Create labels
         if create_labels:
@@ -103,13 +107,13 @@ def cmd_analyze_messages(args):
                 creds, userdata, [dst_label]
             ):
                 sys.exit(1)
-            label_names = list()
+            label_names = []
             for domain in sorted(domains.keys()):
                 label_names.append(get_domain_str(domain))
             if not gmail.create_labels(creds, userdata, label_names):
                 sys.exit(1)
 
-    except KeyboardInterrupt as err:
+    except KeyboardInterrupt:
         print()
         sys.exit(1)
 
@@ -142,7 +146,7 @@ def cmd_find_labels(args):
                 f"Only process {len(include_domains)} domains:"
                 f" {include_domains}"
             )
-            tmp_domains = dict()
+            tmp_domains = {}
             for domain in include_domains:
                 if domain in domains:
                     tmp_domains[domain] = domains[domain]
@@ -171,9 +175,9 @@ def cmd_find_labels(args):
         )
 
         # Print results
-        get_domain_str = lambda domain: (
-            f"{src_label}/{domain}" if src_label else f"{domain}"
-        )
+        def get_domain_str(domain):
+            return f"{src_label}/{domain}" if src_label else f"{domain}"
+
         if verbosity > 0:
             for domain in sorted(domains.keys()):
                 if verbosity == 1 or verbosity > 2:
@@ -243,7 +247,7 @@ def cmd_find_labels(args):
                             f"multiple labels found, ignore: {sorted(labels)}"
                         )
 
-    except KeyboardInterrupt as err:
+    except KeyboardInterrupt:
         print()
         sys.exit(1)
 
