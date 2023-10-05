@@ -398,6 +398,6 @@ def execute_api_call(creds, calls, args):
         print(f"Unknown command: '{err}'")
         return ({}, True)
     except TypeError as err:
-        print(f"Incomplete command: '{calls}'")
+        print(err)
         return ({}, True)
     return (response, False)

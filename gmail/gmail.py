@@ -350,7 +350,7 @@ def execute(creds, line):
     for word in words[1:]:
         tokens = list(filter(None, word.split("=")))
         if len(tokens) != 2:
-            print(f"Wrong argument syntax: '{word}', needs to be <arg>=<value>")
+            print(f"Wrong argument syntax: '{word}' needs to be <arg>=<value>")
             return ({}, True)
         arg = tokens[0]
         value = tokens[1]
@@ -361,9 +361,7 @@ def execute(creds, line):
             try:
                 json_value = json.loads('"' + value + '"')
             except JSONDecodeError:
-                print(
-                    f"Wrong argument value: '{value}', needs to be valid json"
-                )
+                print(f"Wrong argument value: '{value}' needs to be valid json")
                 return ({}, True)
         args[arg] = json_value
     calls = cmd.split("_")

@@ -3,24 +3,10 @@
 import argparse
 import json
 import sys
-import textwrap
 from argparse import RawTextHelpFormatter
 
 from gmail import gmail
-
-
-def __wrap(text, width):
-    return "\n".join(
-        ["\n".join(textwrap.wrap(p, width)) for p in text.split("\n")]
-    )
-
-
-def wrap_long(text):
-    return __wrap(text, 80)
-
-
-def wrap_short(text):
-    return __wrap(text, 56)
+from gmail.textwrap import wrap_long, wrap_short
 
 
 def cmd_analyze_messages(args):
