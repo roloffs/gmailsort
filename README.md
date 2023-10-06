@@ -14,7 +14,7 @@ Enable autocompletion (bash or zsh)
 -----------------------------------
 
 ```bash
-./enable-autocomplete.sh
+activate-global-python-argcomplete && eval "$(register-python-argcomplete gorganizer.py)"
 ```
 
 Usage examples
