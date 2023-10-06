@@ -54,6 +54,9 @@ eval "$(register-python-argcomplete gmailsort.py)"
 Usage examples
 --------------
 
+The following examples assume a `credentials.json` file in the project
+directory.
+
 1. To analyze the messages of your inbox with resepect to their sender
    domains and to see the envisaged label structure (without actually
    creating labels), call
@@ -66,9 +69,9 @@ Usage examples
     Gmail login dialog will open and you have to login and allow the app
     to access your messages. Afterwards, an initial message data
     download is issued. This will probably take several minutes
-    depending on the amount of messages in your Gmail account. All
-    subsequent calls will be much faster and just synchronize the
-    differences between local and remote data.
+    depending on the amount of messages in your Gmail account.
+    Subsequent calls will not ask for a login again and also just
+    synchronize the differences between local and remote data.
 
     `INBOX` is a Gmail built-in label name for your inbox. User-defined
     labels can have any name except these and can be organized
