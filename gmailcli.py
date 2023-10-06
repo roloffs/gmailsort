@@ -6,7 +6,7 @@ import sys
 from argparse import RawTextHelpFormatter
 
 from gmail import gmail, history
-from gmail.textwrap import wrap_long, wrap_short
+from gmail.argparse_utils import checked_file_path, wrap_long, wrap_short
 
 
 def main() -> None:
@@ -27,17 +27,29 @@ def main() -> None:
         "--profile",
         metavar="NAME",
         help=wrap_short(
-            "profile name to store Gmail access token and command history file"
+            "profile name to store Gmail access token and command history"
             f" under '{gmail.get_profile_dir()}'"
         ),
         required=True,
+    )
+    parser.add_argument(
+        "-c",
+        "--credentials",
+        metavar="FILE",
+        help=wrap_short(
+            "OAuth 2.0 client credentials file for your Google Cloud project"
+            " (default: ./credentials.json)"
+        ),
+        default="credentials.json",
+        type=checked_file_path,
     )
 
     # Parse arguments
     args = parser.parse_args()
     profile_name = args.profile
+    credentials_file = args.credentials
 
-    (creds, err) = gmail.authenticate(profile_name)
+    (creds, err) = gmail.authenticate(profile_name, credentials_file)
     if err:
         sys.exit(1)
     profile_dir = gmail.get_profile_dir(profile_name)

@@ -1,3 +1,5 @@
+import argparse
+import os
 import textwrap
 
 
@@ -13,3 +15,9 @@ def wrap_long(text):
 
 def wrap_short(text):
     return __wrap(text, 56)
+
+
+def checked_file_path(path):
+    if os.path.isfile(os.path.expanduser(path)):
+        return path
+    raise argparse.ArgumentTypeError(f"File not found: '{path}'")

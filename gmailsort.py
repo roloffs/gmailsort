@@ -5,14 +5,16 @@ import argparse
 import json
 import sys
 from argparse import RawTextHelpFormatter
+
 import argcomplete
 
 from gmail import gmail
-from gmail.textwrap import wrap_long, wrap_short
+from gmail.argparse_utils import checked_file_path, wrap_long, wrap_short
 
 
 def cmd_analyze_messages(args):
-    profile = args.profile
+    profile_name = args.profile
+    credentials_file = args.credentials
     src_label = args.src_label
     dst_label = args.dst_label
     include_domains = args.include
@@ -21,10 +23,10 @@ def cmd_analyze_messages(args):
     create_labels = args.create_labels
 
     try:
-        (creds, err) = gmail.authenticate(profile)
+        (creds, err) = gmail.authenticate(profile_name, credentials_file)
         if err:
             sys.exit(1)
-        (userdata, err) = gmail.synchronize(creds, profile)
+        (userdata, err) = gmail.synchronize(creds, profile_name)
         if err:
             sys.exit(1)
         # Label existency check
@@ -107,7 +109,8 @@ def cmd_analyze_messages(args):
 
 
 def cmd_find_labels(args):
-    profile = args.profile
+    profile_name = args.profile
+    credentials_file = args.credentials
     src_label = args.src_label
     dst_label = args.dst_label
     include_domains = args.include
@@ -116,10 +119,10 @@ def cmd_find_labels(args):
     sort_messages = args.sort_messages
 
     try:
-        (creds, err) = gmail.authenticate(profile)
+        (creds, err) = gmail.authenticate(profile_name, credentials_file)
         if err:
             sys.exit(1)
-        (userdata, err) = gmail.synchronize(creds, profile)
+        (userdata, err) = gmail.synchronize(creds, profile_name)
         if err:
             sys.exit(1)
         # Label existency check
@@ -262,6 +265,17 @@ def main() -> None:
             f" '{gmail.get_profile_dir()}'"
         ),
         required=True,
+    )
+    parser.add_argument(
+        "-c",
+        "--credentials",
+        metavar="FILE",
+        help=wrap_short(
+            "OAuth 2.0 client credentials file for your Google Cloud project"
+            " (default: ./credentials.json)"
+        ),
+        default="credentials.json",
+        type=checked_file_path,
     )
 
     # analyze-command arguments

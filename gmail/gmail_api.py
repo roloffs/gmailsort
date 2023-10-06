@@ -352,7 +352,7 @@ def modify_message_labels(creds, message_ids, add_label_ids, remove_label_ids):
         try:
             # Response is ignored, since it only returns an empty body
             # on success
-            __execute(
+            _ = __execute(
                 creds,
                 lambda users: users()
                 .messages()

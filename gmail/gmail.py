@@ -24,10 +24,10 @@ def get_profile_dir(profile_name=""):
     return os.path.join(PROFILE_DIR, profile_name)
 
 
-def authenticate(profile_name):
+def authenticate(profile_name, credentials_file):
     profile_path = os.path.join(PROFILE_DIR, profile_name)
     token_path = os.path.join(profile_path, "token.json")
-    return gmail_api.authenticate(token_path, "credentials.json")
+    return gmail_api.authenticate(token_path, credentials_file)
 
 
 def synchronize(creds, profile_name):
