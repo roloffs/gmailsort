@@ -4,3 +4,4 @@ google-auth-oauthlib
 tldextract
 progress
 ftfy
+argcomplete

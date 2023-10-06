@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
+# PYTHON_ARGCOMPLETE_OK
 
 import argparse
 import json
 import sys
 from argparse import RawTextHelpFormatter
+import argcomplete
 
 from gmail import gmail
 from gmail.textwrap import wrap_long, wrap_short
@@ -406,6 +408,9 @@ def main() -> None:
         action="store_true",
     )
     find_parser.set_defaults(func=cmd_find_labels)
+
+    # Enable autocompletion
+    argcomplete.autocomplete(parser)
 
     # Parse arguments and dispatch command
     args = parser.parse_args()
