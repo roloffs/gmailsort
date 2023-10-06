@@ -228,7 +228,7 @@ def cmd_find_labels(args):
 
                 else:
                     if len(found_labels[domain]) == 0:
-                        print("no labels found, ignore")
+                        print("no label found, ignore")
 
                     elif len(found_labels[domain]) > 1:
                         labels = list(
