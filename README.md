@@ -47,7 +47,8 @@ Enable autocompletion (bash or zsh)
 -----------------------------------
 
 ```bash
-activate-global-python-argcomplete && eval "$(register-python-argcomplete gorganizer.py)"
+activate-global-python-argcomplete
+eval "$(register-python-argcomplete gmailsort.py)"
 ```
 
 Usage examples
