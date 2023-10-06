@@ -36,7 +36,6 @@ following steps:
    your project and store them under `credentials.json` in the project
    directory.
 
-
 Install Python dependencies
 ---------------------------
 
@@ -44,6 +43,12 @@ Install Python dependencies
 pip install -r requirements.txt
 ```
 
+Enable autocompletion (bash or zsh)
+-----------------------------------
+
+```bash
+activate-global-python-argcomplete && eval "$(register-python-argcomplete gorganizer.py)"
+```
 
 Usage examples
 --------------
