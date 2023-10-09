@@ -188,55 +188,49 @@ def cmd_find_labels(args):
             print("Sort messages")
             for domain, fq_domains in sorted(domains.items()):
                 print(f"{get_domain_str(domain)}: ", end="")
-                if len(found_labels[domain]) == 1:
-                    # Merge messages from domain into single list
-                    messages = []
-                    list(map(messages.extend, fq_domains.values()))
+                if len(found_labels[domain]) == 0:
+                    print("no label found, ignore")
+                    continue
 
-                    # Partition messages by labels being sublabel of the
-                    # source label
-                    label_ids = gmail.partition_messages_by_prefix(
-                        userdata, messages, src_label
+                if len(found_labels[domain]) > 1:
+                    labels = list(
+                        map(lambda lbl: lbl["name"], found_labels[domain])
                     )
+                    print(f"multiple labels found, ignore: {sorted(labels)}")
+                    continue
 
-                    # Add and remove message labels
-                    add_label_id = found_labels[domain][0]["id"]
-                    for rm_label_id, messages in label_ids.items():
-                        # Ignore removing and adding the same label
-                        if rm_label_id == add_label_id:
-                            print(
-                                "removing and adding the same label, ignore:"
-                                f" '{userdata.labels[add_label_id]['name']}'"
-                            )
-                            continue
-                        rm_label_ids = [rm_label_id] if rm_label_id else []
-                        rm_label_str = (
-                            ", remove label"
-                            f" '{userdata.labels[rm_label_id]['name']}'"
-                            if rm_label_id
-                            else ""
-                        )
+                # Merge messages from domain into single list
+                messages = []
+                list(map(messages.extend, fq_domains.values()))
+
+                # Partition messages by labels being sublabel of the
+                # source label
+                label_ids = gmail.partition_messages_by_prefix(
+                    userdata, messages, src_label
+                )
+
+                # Add and remove message labels
+                add_label_id = found_labels[domain][0]["id"]
+                add_label_name = userdata.labels[add_label_id]["name"]
+                for rm_label_id, messages in label_ids.items():
+                    # Ignore removing and adding the same label
+                    if rm_label_id == add_label_id:
                         print(
-                            "sort messages, add label"
-                            f" '{userdata.labels[add_label_id]['name']}'"
-                            f"{rm_label_str}"
+                            "removing and adding the same label, ignore:"
+                            f" '{add_label_name}'"
                         )
-                        if not gmail.modify_message_labels(
-                            creds, messages, [add_label_id], rm_label_ids
-                        ):
-                            sys.exit(1)
-
-                else:
-                    if len(found_labels[domain]) == 0:
-                        print("no label found, ignore")
-
-                    elif len(found_labels[domain]) > 1:
-                        labels = list(
-                            map(lambda lbl: lbl["name"], found_labels[domain])
-                        )
-                        print(
-                            f"multiple labels found, ignore: {sorted(labels)}"
-                        )
+                        continue
+                    rm_label_ids = []
+                    label_str = f"add label '{add_label_name}'"
+                    if rm_label_id:
+                        rm_label_ids += rm_label_id
+                        rm_label_name = userdata.labels[rm_label_id]["name"]
+                        label_str += f", remove label '{rm_label_name}'"
+                    print(label_str)
+                    if not gmail.modify_message_labels(
+                        creds, messages, [add_label_id], rm_label_ids
+                    ):
+                        sys.exit(1)
 
     except KeyboardInterrupt:
         print()
