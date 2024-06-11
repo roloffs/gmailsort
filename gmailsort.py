@@ -223,7 +223,7 @@ def cmd_find_labels(args):
                     rm_label_ids = []
                     label_str = f"add label '{add_label_name}'"
                     if rm_label_id:
-                        rm_label_ids += rm_label_id
+                        rm_label_ids.append(rm_label_id)
                         rm_label_name = userdata.labels[rm_label_id]["name"]
                         label_str += f", remove label '{rm_label_name}'"
                     print(label_str)
