@@ -57,7 +57,7 @@ Usage examples
 The following examples assume a `credentials.json` file in the project
 directory.
 
-1. To analyze the messages of your inbox with resepect to their sender
+1. To analyze the messages of your inbox with respect to their sender
    domains and to see the envisaged label structure (without actually
    creating labels), call
 
@@ -98,7 +98,7 @@ directory.
     inbox contains multiple messages from the domain `foobar` and a
     label called `test/foobar` is existing, it will be displayed as
     matching target label. Only the lowest hierarchy level will be used
-    for name comparision, i.e., a label called `foobar/test` will not be
+    for name comparison, i.e., a label called `foobar/test` will not be
     displayed as match.
 
     If the messages from each domain shall be sorted under their

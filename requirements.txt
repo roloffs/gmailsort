@@ -5,3 +5,6 @@ tldextract
 progress
 ftfy
 argcomplete
+flake8
+pytest
+pylint
