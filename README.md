@@ -81,7 +81,7 @@ directory.
     Specifying a destination label (as `test` in this case) is optional.
     Otherwise, labels will be created top level. If you are happy with
     the envisaged labels structure, you can actually create it by
-    calling the command again and adding the command-line option `-l` or
+    calling the command again and adding the command-line option
     `--create-labels`.
 
 1. To find labels matching the sender domains of your inbox messages
@@ -103,8 +103,8 @@ directory.
 
     If the messages from each domain shall be sorted under their
     respective labels, just call the command again and add the
-    command-line option `-m` or `--sort-messages`. If multiple labels
-    match a domain such as `one/foobar` and `two/foobar`, you can use
-    the destination label command-line option `-d` to restrict the
-    search to be started at a specific label, e.g., `-d two` will only
-    find the second label as single label.
+    command-line option `--sort-messages`. If multiple labels match a
+    domain such as `one/foobar` and `two/foobar`, you can use the
+    destination label command-line option `-d` to restrict the search to
+    be started at a specific label, e.g., `-d two` will only find the
+    second label as single label.

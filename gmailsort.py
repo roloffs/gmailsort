@@ -338,7 +338,6 @@ def main() -> None:
         default=0,
     )
     analyze_parser.add_argument(
-        "-l",
         "--create-labels",
         help=wrap_short("labels are actually created (modifies Gmail data)"),
         action="store_true",
@@ -410,7 +409,6 @@ def main() -> None:
         default=0,
     )
     find_parser.add_argument(
-        "-m",
         "--sort-messages",
         help=wrap_short("messages are actually sorted (modifies Gmail data)"),
         action="store_true",
